@@ -81,9 +81,9 @@ async def startupmessage():
         if BOTLOG:
             Config.ZEDUBLOGO = await zedub.tgbot.send_file(
                 BOTLOG_CHATID,
-                "https://telegra.ph/file/f821d27af168206b472ad.mp4",
-                caption="**•⎆┊تـم بـدء تشغـيل سـورس زدثــون الخاص بك .. بنجاح 🧸♥️**",
-                buttons=[(Button.url("𝙕𝙀𝘿𝙏𝙝𝙤𝙣𓅛", "https://t.me/ZedThon"),)],
+                "https://telegra.ph/file/67c1c8ce36d9857a6433c.jpg",
+                caption="**•⎆┊تـم بـدء تشغـيل سـورس العابث الخاص بك .. بنجاح 🧸♥️**",
+                buttons=[(Button.url("𓆩𓅃𝘼𝙇𝘼𝙋𝘼𝙏𝙃𓃠𓆪 ", "https://t.me/ALAPATH"),)],
             )
     except Exception as e:
         LOGS.error(e)
@@ -131,7 +131,7 @@ async def mybot():
             await asyncio.sleep(1)
             await bot.send_message("@BotFather", botname)
             await asyncio.sleep(1)
-            await bot.send_message("@BotFather", "ZThon")
+            await bot.send_message("@BotFather", "ALAPATH")
             await asyncio.sleep(3)
             await bot.send_message("@BotFather", "/setname")
             await asyncio.sleep(1)
@@ -149,13 +149,13 @@ async def mybot():
             await asyncio.sleep(1)
             await bot.send_message("@BotFather", botname)
             await asyncio.sleep(1)
-            await bot.send_message("@BotFather", f"- بـوت زدثــون المسـاعـد ♥️🦾 الخـاص بـ  {bot.me.first_name} ")
+            await bot.send_message("@BotFather", f"- بـوت العابث المسـاعـد ♥️🦾 الخـاص بـ  {bot.me.first_name} ")
             await asyncio.sleep(3)
             await bot.send_message("@BotFather", "/setdescription")
             await asyncio.sleep(1)
             await bot.send_message("@BotFather", botname)
             await asyncio.sleep(1)
-            await bot.send_message("@BotFather", f"•⎆┊انـا البــوت المسـاعـد الخــاص بـ {zel_zal} \n•⎆┊بـواسطـتـي يمكـنك التواصــل مـع مـالكـي 🧸♥️\n•⎆┊قنـاة السـورس 🌐 @ZedThon 🌐")
+            await bot.send_message("@BotFather", f"•⎆┊انـا البــوت المسـاعـد الخــاص بـ {zel_zal} \n•⎆┊بـواسطـتـي يمكـنك التواصــل مـع مـالكـي 🧸♥️\n•⎆┊قنـاة السـورس "@JIBTON")
         except Exception as e:
             print(e)
 
