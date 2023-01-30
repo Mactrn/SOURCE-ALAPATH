@@ -81,7 +81,7 @@ async def startupmessage():
         if BOTLOG:
             Config.ZEDUBLOGO = await zedub.tgbot.send_file(
                 BOTLOG_CHATID,
-                "https://telegra.ph/file/f821d27af168206b472ad.mp4",
+                "https://telegra.ph/file/dcbe7f49a9567c6f0f37b.jpg",
                 caption="**•⎆┊تـم بـدء تشغـيل سـورس العابث الخاص بك .. بنجاح 🧸♥️**",
                 buttons=[(Button.url("𝘼𝙇𝘼𝙋𝘼𝙏𝙃 ", "https://t.me/ALAPATH"),)],
             )
@@ -131,7 +131,7 @@ async def mybot():
             await asyncio.sleep(1)
             await bot.send_message("@BotFather", botname)
             await asyncio.sleep(1)
-            await bot.send_message("@BotFather", "ZThon")
+            await bot.send_message("@BotFather", "ALAPATH")
             await asyncio.sleep(3)
             await bot.send_message("@BotFather", "/setname")
             await asyncio.sleep(1)
@@ -143,7 +143,7 @@ async def mybot():
             await asyncio.sleep(1)
             await bot.send_message("@BotFather", botname)
             await asyncio.sleep(1)
-            await bot.send_file("@BotFather", "zthon/zilzal/logozed.jpg")
+            await bot.send_file("@BotFather", "https://telegra.ph/file/795517e7611c094fb76bb.jpg")
             await asyncio.sleep(3)
             await bot.send_message("@BotFather", "/setabouttext")
             await asyncio.sleep(1)
