@@ -33,7 +33,7 @@ async def _(event):
     if event.fwd_from:
         return
     event = await edit_or_reply(event, ".🤣")
-    deq = deque(list("😂🤣😂🤣😂🤣"))
+    deq = deque(list("😂😹🤣😹😂😹🤣"))
     for _ in range(48):
         await asyncio.sleep(0.1)
         await event.edit("".join(deq))
@@ -45,7 +45,7 @@ async def _(event):
     if event.fwd_from:
         return
     event = await edit_or_reply(event, "🙂.")
-    deq = deque(list("😁☹️😁☹️😁☹️😁"))
+    deq = deque(list("😕🙁☹️😢🥺😞😔"))
     for _ in range(48):
         await asyncio.sleep(0.4)
         await event.edit("".join(deq))
