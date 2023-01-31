@@ -116,7 +116,7 @@ async def autobio_loop():
               namerzfont = gvarstatus("ZI_FN") or "𝟭𝟮𝟯𝟰𝟱𝟲𝟳𝟴𝟵𝟬"
               namefont = namerzfont[normzltext.index(normal)]
               HM = HM.replace(normal, namefont)
-        DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله على كل شئ - @ALQPATH"
+        DEFAULTUSERBIO = gvarstatus("DEFAULT_BIO") or "الحمد الله على كل شئ - @ALAPATH"
         bio = f"{DEFAULTUSERBIO} ⏐ {HM}"
         LOGS.info(bio)
         try:
