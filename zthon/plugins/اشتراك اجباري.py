@@ -1,4 +1,4 @@
-from telethon import events
+من  zthon  import  zedub
 from telethon.errors import ChatAdminRequiredError
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
