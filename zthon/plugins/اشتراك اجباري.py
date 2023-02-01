@@ -1,9 +1,9 @@
-من  zthon  import  zedub
+from telethon import events
 from telethon.errors import ChatAdminRequiredError
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
 
-from jmub import jmub
+from IXI import IXI
 
 from ..sql_helper.fsub_sql import add_fsub, all_fsub, is_fsub, rm_fsub
 from . import edit_delete, edit_or_reply
@@ -11,7 +11,7 @@ from . import edit_delete, edit_or_reply
 
 async def participant_check(channel, user_id):
     try:
-        await jmub(GetParticipantRequest(channel, int(user_id)))
+        await IXI(GetParticipantRequest(channel, int(user_id)))
         return True
     except UserNotParticipantError:
         return False
@@ -19,7 +19,7 @@ async def participant_check(channel, user_id):
         return False
 
 
-@jmub.ar_cmd(pattern="اجباري ?(.*)")
+@IXI.ar_cmd(pattern="اجباري ?(.*)")
 async def fsub(event):
     if event.is_private:
         return
@@ -50,7 +50,7 @@ async def fsub(event):
                 return await event.reply("هذه القناة غير صالحة .")
         except:
             return await event.reply("يجب وضع المعرف بشكل صحيح.")
-        if not await participant_check(channel, jmub.uid):
+        if not await participant_check(channel, IXI.uid):
             return await event.reply(
                 f"❗**أنا لست ادمن في هذه القناة**\n [القناة](https://t.me/{channel}). يجب ان اكون مشرف في القناة اولا.",
                 link_preview=False,
@@ -61,7 +61,7 @@ async def fsub(event):
         )
 
 
-@jmub.ar_cmd(pattern="تعطيل الاجباري")
+@IXI.ar_cmd(pattern="تعطيل الاجباري")
 async def removefsub(event):
     rm_fsub(event.chat_id)
     await edit_or_reply(event, "**- تم بنجاح تعطيل الاشتراك الاجباري في هذه المجموعة**")
