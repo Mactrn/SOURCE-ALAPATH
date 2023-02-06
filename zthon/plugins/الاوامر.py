@@ -241,7 +241,7 @@ async def zed_handler(event):
     query = event.text
     await zedub.get_me()
     if query.startswith("عابث") and event.query.user_id == zedub.uid:
-        ZPIC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/1035d07280ee0ec9fc29b.mp4"
+        ZPIC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/55b2698d27a67e4275cdc.jpg"
         buttons = [[Button.url("قنـاة السـورس", "https://t.me/JIBTHON"),],[Button.url("التحـديثـات", "https://t.me/JIBTHON"), Button.url("الفـارات", "https://t.me/JIBTHON"),],[Button.url("الشـروحـات¹", "https://t.me/JIBTHON"),],[Button.url("الشـروحـات²", "https://t.me/JIBTHON"),],[Button.url("مطـور السـورس", "https://t.me/ALAPATH"),]]
         if ZPIC and ZPIC.endswith((".jpg", ".png", "gif", "mp4")):
             result = builder.photo(ZPIC,text=Channels, buttons=buttons, link_preview=True)
@@ -270,7 +270,7 @@ async def zed_handler(event):
     query = event.text
     await zedub.get_me()
     if query.startswith("سورس") and event.query.user_id == zedub.uid:
-        ZPIC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/1035d07280ee0ec9fc29b.mp4"
+        ZPIC = gvarstatus("ALIVE_PIC") or "https://telegra.ph/file/3083c6d2d2108297b6a22.jpg"
         buttons = [[Button.url("قنـاة الســورس", "https://t.me/JIBTHON"), Button.url("مطـور الســورس", "https://t.me/ALAPATH")]]
         if ZPIC and ZPIC.endswith((".jpg", ".png")):
             result = builder.photo(ZPIC,text=Zelzal, buttons=buttons, link_preview=True)
