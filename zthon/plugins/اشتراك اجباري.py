@@ -19,7 +19,7 @@ async def participant_check(channel, user_id):
         return False
 
 
-@IXI.ar_cmd(pattern="اجباري ?(.*)")
+@IXI.ar_cmd(pattern="اجباري")
 async def fsub(event):
     if event.is_private:
         return
