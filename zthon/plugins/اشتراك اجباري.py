@@ -5,8 +5,8 @@ from telethon.tl.functions.channels import GetParticipantRequest
 
 from zthon import zedub
 
-from ..sql_helper.fsub_sql import add_fsub, all_fsub, is_fsub, rm_fsub
-from . import edit_delete, edit_or_reply
+from ..sql_helper.globals import addgvar, delgvar, gvarstatus
+from . import BOTLOG, BOTLOG_CHATID, HEROKU_APP, mention
 
 
 async def participant_check(channel, user_id):
