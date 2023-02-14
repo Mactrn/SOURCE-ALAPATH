@@ -3,7 +3,7 @@ from telethon.errors import ChatAdminRequiredError
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
 
-from IXI import IXI
+from zthon import zthon
 
 from ..sql_helper.fsub_sql import add_fsub, all_fsub, is_fsub, rm_fsub
 from . import edit_delete, edit_or_reply
@@ -11,7 +11,7 @@ from . import edit_delete, edit_or_reply
 
 async def participant_check(channel, user_id):
     try:
-        await IXI(GetParticipantRequest(channel, int(user_id)))
+        await zthon(GetParticipantRequest(channel, int(user_id)))
         return True
     except UserNotParticipantError:
         return False
@@ -19,7 +19,7 @@ async def participant_check(channel, user_id):
         return False
 
 
-@IXI.ar_cmd(pattern="اجباري ?(.*)")
+@zthon.ar_cmd(pattern="اجباري ?(.*)")
 async def fsub(event):
     if event.is_private:
         return
@@ -67,7 +67,7 @@ async def removefsub(event):
     await edit_or_reply(event, "**- تم بنجاح تعطيل الاشتراك الاجباري في هذه المجموعة**")
 
 
-@jmub.on(events.NewMessage())
+@zthon.on(events.NewMessage())
 async def fsub_n(e):
     if all_fsub() == None:
         return
