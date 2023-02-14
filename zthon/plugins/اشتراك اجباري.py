@@ -3,7 +3,7 @@ from telethon.errors import ChatAdminRequiredError
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
 
-from zthon import zedub
+from zedub import zedub
 
 from ..sql_helper.fsub_sql import add_fsub, all_fsub, is_fsub, rm_fsub
 from . import edit_delete, edit_or_reply
@@ -11,7 +11,7 @@ from . import edit_delete, edit_or_reply
 
 async def participant_check(channel, user_id):
     try:
-        await zthon(GetParticipantRequest(channel, int(user_id)))
+        await zedub(GetParticipantRequest(channel, int(user_id)))
         return True
     except UserNotParticipantError:
         return False
@@ -19,7 +19,7 @@ async def participant_check(channel, user_id):
         return False
 
 
-@zthon.ar_cmd(pattern="اجباري ?(.*)")
+@zedub.ar_cmd(pattern="اجباري ?(.*)")
 async def fsub(event):
     if event.is_private:
         return
@@ -61,13 +61,13 @@ async def fsub(event):
         )
 
 
-@IXI.ar_cmd(pattern="تعطيل الاجباري")
+@zedub.ar_cmd(pattern="تعطيل الاجباري")
 async def removefsub(event):
     rm_fsub(event.chat_id)
     await edit_or_reply(event, "**- تم بنجاح تعطيل الاشتراك الاجباري في هذه المجموعة**")
 
 
-@zthon.on(events.NewMessage())
+@zedub.on(events.NewMessage())
 async def fsub_n(e):
     if all_fsub() == None:
         return
