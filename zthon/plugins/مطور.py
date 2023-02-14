@@ -11,18 +11,17 @@ from telethon.errors.rpcerrorlist import (
 )
 from telethon.events import CallbackQuery
 
-from jepthon import StartTime, jepiq, JEPVERSION
+from zthon import StartTime, zedub, JEPVERSION
 
 from ..Config import Config
-from ..core.managers import edit_or_reply
-from ..helpers.functions import catalive, check_data_base_heal_th, get_readable_time
-from ..helpers.utils import reply_id
+from ..core.managers import edit_or_reply, edit_delete
+from ..helpers import reply_id
 from ..sql_helper.globals import gvarstatus
-from . import mention
+from . import spamwatch
 
 plugin_category = "utils"
 
-@jepiq.ar_cmd(
+@zedub.ar_cmd(
     pattern="المطور$",
     command=("المطور", plugin_category),
     info={
@@ -53,7 +52,7 @@ async def amireallyalive(event):
             event.chat_id, PIC, caption=cat_caption, reply_to=reply_to_id
         )
 
-@jepiq.tgbot.on(CallbackQuery(data=re.compile(b"stats")))
+@zedub.tgbot.on(CallbackQuery(data=re.compile(b"stats")))
 async def on_plug_in_callback_query_handler(event):
     statstext = await catalive(StartTime)
     await event.answer(statstext, cache_time=0, alert=True)
