@@ -3,7 +3,7 @@ from telethon.errors import ChatAdminRequiredError
 from telethon.errors.rpcerrorlist import UserNotParticipantError
 from telethon.tl.functions.channels import GetParticipantRequest
 
-from zthon import zthon
+from zthon import zedub
 
 from ..sql_helper.fsub_sql import add_fsub, all_fsub, is_fsub, rm_fsub
 from . import edit_delete, edit_or_reply
