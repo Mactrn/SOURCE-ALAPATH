@@ -1,22 +1,20 @@
-from telethon import events
-from telethon.errors import ChatAdminRequiredError
-from telethon.errors.rpcerrorlist import UserNotParticipantError
-from telethon.tl.functions.channels import GetParticipantRequest
+import os
+import random
+from asyncio import sleep
+
+from telethon.tl.functions.photos import GetUserPhotosRequest
+from telethon.tl.functions.users import GetFullUserRequest
+from telethon.tl.types import MessageEntityMentionName
+from telethon.utils import get_input_location
 
 from zthon import zedub
+from zthon.core.logger import logging
 
-from ..sql_helper.globals import addgvar, delgvar, gvarstatus
-from . import BOTLOG, BOTLOG_CHATID, HEROKU_APP, mention
-
-
-async def participant_check(channel, user_id):
-    try:
-        await zedub(GetParticipantRequest(channel, int(user_id)))
-        return True
-    except UserNotParticipantError:
-        return False
-    except:
-        return False
+from ..Config import Config
+from ..core.managers import edit_or_reply, edit_delete
+from ..helpers import reply_id
+from . import *
+from . import mention
 
 
 @zedub.ar_cmd(pattern="اجباري ?(.*)")
