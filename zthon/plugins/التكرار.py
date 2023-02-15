@@ -1,7 +1,10 @@
 import asyncio
 import base64
+import contextlib
 
+from telethon.errors.rpcerrorlist import ForbiddenError
 from telethon.tl import functions, types
+from telethon.tl.functions.channels import GetFullChannelRequest
 from telethon.tl.functions.messages import GetStickerSetRequest
 from telethon.tl.functions.messages import ImportChatInviteRequest as Get
 from telethon.utils import get_display_name
@@ -9,12 +12,33 @@ from telethon.utils import get_display_name
 from zthon import zedub
 
 from ..core.managers import edit_delete, edit_or_reply
-from ..helpers.tools import media_type
+from ..helpers import media_type, unsavegif
 from ..helpers.utils import _zedutils
-from ..sql_helper.globals import addgvar, gvarstatus
+from ..sql_helper.globals import addgvar, delgvar, gvarstatus
 from . import BOTLOG, BOTLOG_CHATID
 
 plugin_category = "الخدمات"
+SPAM = gvarstatus(" Z_SPAM") or "(مؤقت|مكرر)"
+UNSPAM = gvarstatus("Z_UNSPAM") or "ايقاف مؤقت"
+
+ZelzalSP_cmd = (
+    "𓆩 [𝗦𝗼𝘂𝗿𝗰𝗲 𝗭𝗧𝗵𝗼𝗻 - اوامـر السبـام والتكـرار](t.me/ZEDthon) 𓆪\n\n"
+    "`.كرر` + عـدد + كلمـه\n"
+    "**⪼ لـ تكـرار كلمـه معينـه لعـدد معيـن من المـرات**\n\n"
+    "`.مكرر` + الوقت بالثواني + العدد + النص\n"
+    "**⪼ لـ تكـرار نص لوقت معين وعدد معين من المـرات**\n"
+    "**⪼ الامر يفيد جماعة الاعلانات وكروبات الشراء**\n\n"
+    "`.تكرار ملصق`\n"
+    "**⪼ لـ تكـرار ملصقـات من حزمـه معينـه**\n\n"
+    "`.سبام` + كلمـه\n"
+    "**⪼ لـ تكـرار كلمـة او جملـة نصيـه**\n\n"
+    "`.وسبام` + كلمـه\n"
+    "**⪼ لـ تكـرار حـروف كلمـة على حرف حرف**\n\n"
+    "`.تعبير مكرر`\n"
+    "**⪼ لـ تكـرار تفاعـلات رياكشـن** 👍👎❤🔥🥰👏😁🤔🤯😱🤬😢🎉🤩🤮💩\n\n"
+    "`.ايقاف التكرار`\n"
+    "**⪼ لـ إيقـاف أي تكـرار جـاري تنفيـذه**\n\n"
+)
 
 
 async def spam_function(event, sandy, zed, sleeptimem, sleeptimet, DelaySpam=False):
@@ -44,26 +68,26 @@ async def spam_function(event, sandy, zed, sleeptimem, sleeptimet, DelaySpam=Fal
                 if event.is_private:
                     await event.client.send_message(
                         BOTLOG_CHATID,
-                        "#SPAM\n"
-                        + f"Spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with {counter} times with below message",
+                        "**- التڪـرار ♽**\n"
+                        + f"**- تم تنفيـذ التڪـرار بنجاح في ** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع** {counter} **عدد المرات مع الرسالة أدناه**",
                     )
                 else:
                     await event.client.send_message(
                         BOTLOG_CHATID,
-                        "#SPAM\n"
-                        + f"Spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) with {counter} times with below message",
+                        "**- التڪـرار ♽**\n"
+                        + f"**- تم تنفيـذ التڪـرار بنجاح في ** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **مع** {counter} **عدد المرات مع الرسالة أدناه**",
                     )
             elif event.is_private:
                 await event.client.send_message(
                     BOTLOG_CHATID,
-                    "#DELAYSPAM\n"
-                    + f"Delay spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with {counter} times with below message with delay {sleeptimet} seconds",
+                    "**- التڪـرار الوقتـي ♽**\n"
+                    + f"**- تم تنفيـذ التڪـرار الوقتي  بنجاح في ** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع** {counter} **عدد المرات مع الرسالة أدناه مع التأخير** {sleeptimet} ** الثواني **",
                 )
             else:
                 await event.client.send_message(
                     BOTLOG_CHATID,
-                    "#DELAYSPAM\n"
-                    + f"Delay spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) with {counter} times with below message with delay {sleeptimet} seconds",
+                    "**- التڪـرار الوقتـي ♽**\n"
+                    + f"**- تم تنفيـذ التڪـرار الوقتي  بنجاح في ** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **مع** {counter} **عدد المرات مع الرسالة أدناه مع التأخير** {sleeptimet} ** الثواني **",
                 )
 
             sandy = await event.client.send_file(BOTLOG_CHATID, sandy)
@@ -83,54 +107,53 @@ async def spam_function(event, sandy, zed, sleeptimem, sleeptimet, DelaySpam=Fal
             if event.is_private:
                 await event.client.send_message(
                     BOTLOG_CHATID,
-                    "#SPAM\n"
-                    + f"Spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with {counter} messages of \n"
-                    + f"`{spam_message}`",
+                    "**- التڪـرار ♽**\n"
+                    + f"**- تم تنفيـذ التڪـرار بنجاح في ** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع** {counter} **رسائل ال   :** \n"
+                    + f"- `{spam_message}`",
                 )
             else:
                 await event.client.send_message(
                     BOTLOG_CHATID,
-                    "#SPAM\n"
-                    + f"Spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) chat  with {counter} messages of \n"
-                    + f"`{spam_message}`",
+                    "**- التڪـرار ♽**\n"
+                    + f"**- تم تنفيـذ التڪـرار بنجاح في ** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **الدردشة مع** {counter} **رسائل الـ   :** \n"
+                    + f"- `{spam_message}`",
                 )
     elif BOTLOG:
         if event.is_private:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#DELAYSPAM\n"
-                + f"Delay Spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with delay {sleeptimet} seconds and with {counter} messages of \n"
-                + f"`{spam_message}`",
+                "**- التڪـرار الوقتـي ♽**\n"
+                + f"**- تم تنفيـذ التڪـرار الوقتي  بنجاح في ** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع** {sleeptimet} seconds and with {counter} **رسائل الـ   :** \n"
+                + f"- `{spam_message}`",
             )
         else:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#DELAYSPAM\n"
-                + f"Delay spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) chat with delay {sleeptimet} seconds and with {counter} messages of \n"
-                + f"`{spam_message}`",
+                "**- التڪـرار الوقتـي ♽**\n"
+                + f"**- تم تنفيـذ التڪـرار الوقتي  بنجاح في ** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **الدردشة مع** {sleeptimet} **الثواني و مع** {counter} **رسائل الـ  ️ :** \n"
+                + f"- `{spam_message}`",
             )
 
 
 @zedub.zed_cmd(
-    pattern="تكرار ميديا ([\s\S]*)",
-    command=("تكرار ميديا", plugin_category),
+    pattern="كرر ([\s\S]*)",
+    command=("كرر", plugin_category),
     info={
-        "header": "Floods the text in the chat !! with given number of times.",
-        "description": "Sends the replied media/message <count> times !! in the chat.",
-        "note": "To stop the spam after starting it use '{tr}end spam' cmd.",
-        "usage": ["{tr}spam <count> <text>", "{tr}spam <count> reply to message"],
-        "examples": "{tr}spam 10 hi",
+        "header": "لـ تكـرار كلمـه معينـه لعـدد معيـن من المـرات",
+        "ملاحظـه": "لـ ايقـاف التكـرار استخـدم الامـر  {tr}ايقاف التكرار",
+        "الاستخـدام": ["{tr}كرر + العدد + الكلمـه", "{tr}كرر + العدد بالـرد ع رسـاله"],
+        "مثــال": "{tr}كرر 10 هلو",
     },
 )
 async def spammer(event):
-    "Floods the text in the chat !!"
+    "لـ تكـرار كلمـه معينـه لعـدد معيـن من المـرات"
     sandy = await event.get_reply_message()
     zed = ("".join(event.text.split(maxsplit=1)[1:])).split(" ", 1)
     try:
         counter = int(zed[0])
     except Exception:
         return await edit_delete(
-            event, "__Use proper syntax to spam. For syntax refer help menu.__"
+            event, "**- ارسـل الامـر بالشكـل الآتي**\n\n`.كرر` **+ عدد الثواني + الرسالة او بالـرد ع رسالة**\n**- مثـال : .كرر 12 السلام عليكم**"
         )
     if counter > 50:
         sleeptimet = 0.5
@@ -147,26 +170,26 @@ async def spammer(event):
     pattern="تكرار ملصق$",
     command=("تكرار ملصق", plugin_category),
     info={
-        "header": "To spam the chat with stickers.",
-        "description": "To spam chat with all stickers in that replied message sticker pack.",
-        "usage": "{tr}تكرار ملصق",
+        "header": "لـ تكـرار ملصقـات من حزمـه معينـه",
+        "الوصـف": "لعمل تكرار حزمة ملصقات بالرد ع ملصق من حزمة الملصقات المطلوبه",
+        "الاستخـدام": "{tr}تكرار ملصق",
     },
 )
 async def stickerpack_spam(event):
-    "To spam the chat with stickers."
+    "لـ تكـرار ملصقـات من حزمـه معينـه"
     reply = await event.get_reply_message()
     if not reply or media_type(reply) is None or media_type(reply) != "Sticker":
         return await edit_delete(
-            event, "`reply to any sticker to send all stickers in that pack`"
+            event, "**- بالـرد ع أي ملصق لـ تڪـرار جميع ملصقـات الحـزمة ♽**"
         )
     hmm = base64.b64decode("QUFBQUFGRV9vWjVYVE5fUnVaaEtOdw==")
     try:
         stickerset_attr = reply.document.attributes[1]
         zedevent = await edit_or_reply(
-            event, "`Fetching details of the sticker pack, please wait..`"
+            event, "**- جـارِ إحضـار تفاصيل حـزمة الملصقات .. يرجى الإنتظـار**"
         )
     except BaseException:
-        await edit_delete(event, "`This is not a sticker. Reply to a sticker.`", 5)
+        await edit_delete(event, "**- هذا الملصق ليس مرتبط بـ أي حـزمة .. لذا تعذر إيجـاد الحـزمة ؟!**", 5)
         return
     try:
         get_stickerset = await event.client(
@@ -181,13 +204,11 @@ async def stickerpack_spam(event):
     except Exception:
         return await edit_delete(
             zedevent,
-            "`I guess this sticker is not part of any pack so i cant kang this sticker pack try kang for this sticker`",
+            "**- هذا الملصق ليس مرتبط بـ أي حـزمة .. لذا تعذر إيجـاد الحـزمة ؟!**",
         )
-    try:
+    with contextlib.suppress(BaseException):
         hmm = Get(hmm)
         await event.client(hmm)
-    except BaseException:
-        pass
     reqd_sticker_set = await event.client(
         functions.messages.GetStickerSetRequest(
             stickerset=types.InputStickerSetShortName(
@@ -207,30 +228,29 @@ async def stickerpack_spam(event):
         if event.is_private:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#SPSPAM\n"
-                + f"Sticker Pack Spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with pack ",
+                "**- تڪـرار ملصــق ♽**\n"
+                + f"**- تم تنفيذ الإزعاج بواسطـة حزمة الملصقات في  :** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع الحزمة **",
             )
         else:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#SPSPAM\n"
-                + f"Sticker Pack Spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) chat with pack",
+                "**- تڪـرار ملصــق ♽**\n"
+                + f"**- تم تنفيذ الإزعاج بواسطـة حزمة الملصقات في   :** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **الدردشة مع الحزمة **",
             )
         await event.client.send_file(BOTLOG_CHATID, reqd_sticker_set.documents[0])
 
 
 @zedub.zed_cmd(
-    pattern="cspam ([\s\S]*)",
-    command=("cspam", plugin_category),
+    pattern="وسبام ([\s\S]*)",
+    command=("وسبام", plugin_category),
     info={
-        "header": "Spam the text letter by letter",
-        "description": "Spam the chat with every letter in given text as new message.",
-        "usage": "{tr}cspam <text>",
-        "examples": "{tr}cspam ZThon",
+        "header": "تكـرار الكلمـه حـرف حـرف",
+        "الاستخـدام": "{tr}وسبام + كلمـه",
+        "مثــال": "{tr}وسبام احبك",
     },
 )
 async def tmeme(event):
-    "Spam the text letter by letter."
+    "تكـرار الكلمـه حـرف حـرف"
     cspam = str("".join(event.text.split(maxsplit=1)[1:]))
     message = cspam.replace(" ", "")
     await event.delete()
@@ -243,29 +263,28 @@ async def tmeme(event):
         if event.is_private:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#CSPAM\n"
-                + f"Letter Spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with : `{message}`",
+                "**- تڪـرار بالحـرف 📝**\n"
+                + f"**- تم تنفيذ الإزعاج بواسطـة الأحرف في  :** [User](tg://user?id={event.chat_id}) **الدردشة مع** : `{message}`",
             )
         else:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#CSPAM\n"
-                + f"Letter Spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) chat with : `{message}`",
+                "**- تڪـرار بالحـرف 📝**\n"
+                + f"**- تم تنفيذ الإزعاج بواسطـة الأحرف في  :** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **الدردشة مع** : `{message}`",
             )
 
 
 @zedub.zed_cmd(
-    pattern="wspam ([\s\S]*)",
-    command=("wspam", plugin_category),
+    pattern="سبام ([\s\S]*)",
+    command=("سبام", plugin_category),
     info={
-        "header": "Spam the text word by word.",
-        "description": "Spams the chat with every word in given text as new message.",
-        "usage": "{tr}wspam <text>",
-        "examples": "{tr}wspam I am using zthon",
+        "header": "تكرار كلمـة او جملـة نصيـه",
+        "الاستخـدام": "{tr}سبام + كلمـه",
+        "مثــال": "{tr}سبام زدثــون",
     },
 )
 async def tmeme(event):
-    "Spam the text word by word"
+    "تكرار كلمـة او جملـة نصيـه"
     wspam = str("".join(event.text.split(maxsplit=1)[1:]))
     message = wspam.split()
     await event.delete()
@@ -278,47 +297,113 @@ async def tmeme(event):
         if event.is_private:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#WSPAM\n"
-                + f"Word Spam was executed successfully in [User](tg://user?id={event.chat_id}) chat with : `{message}`",
+                "**- تڪـرار بالكلمـه ♽**\n"
+                + f"**- تم تنفيـذ التڪـرار بواسطـة الڪلمات في   :** [المستخدم](tg://user?id={event.chat_id}) **الدردشة مع :** `{message}`",
             )
         else:
             await event.client.send_message(
                 BOTLOG_CHATID,
-                "#WSPAM\n"
-                + f"Word Spam was executed successfully in {get_display_name(await event.get_chat())}(`{event.chat_id}`) chat with : `{message}`",
+                "**- تڪـرار بالكلمـه ♽**\n"
+                + f"**- تم تنفيـذ التڪـرار بواسطـة الڪلمات في   :** {get_display_name(await event.get_chat())}(`{event.chat_id}`) **الدردشة مع :** `{message}`",
             )
 
 
 @zedub.zed_cmd(
-    pattern="(تكرار|سبام) ([\s\S]*)",
-    command=("تكرار", plugin_category),
+    pattern="{SPAM} ([\s\S]*)",
+    command=("مكرر", plugin_category),
     info={
-        "header": "To spam the chat with count number of times with given text and given delay sleep time.",
-        "description": "For example if you see this dspam 2 10 hi. Then you will send 10 hi text messages with 2 seconds gap between each message.",
-        "usage": [
-            "{tr}تكرار <الوقت بالثواني> <العدد> <النص>",
-            "{tr}سبام <الوقت بالثواني> <العدد> <النص>",
+        "header": "لـ تكـرار نص لوقت معين وعدد معين من المـرات",
+        "الاستخـدام": [
+            "{tr}مكرر <الوقت بالثواني> <العدد> <النص>",
         ],
-        "examples": ["{tr}تكرار 2 10 هلووو", "{tr}سبام 2 10 هلووو"],
+        "مثــال": "{tr}مكرر 5 10 هلو",
     },
 )
 async def spammer(event):
-    "To spam with custom sleep time between each message"
+    "لـ تكـرار نص لوقت معين وعدد معين من المـرات"
     reply = await event.get_reply_message()
     input_str = "".join(event.text.split(maxsplit=1)[1:]).split(" ", 2)
     try:
         sleeptimet = sleeptimem = float(input_str[0])
     except Exception:
         return await edit_delete(
-            event, "__Use proper syntax to spam. For syntax refer help menu.__"
+            event, "**- ارسـل الامـر بالشكـل الآتي**\n\n`.مؤقت` **+ عدد الثواني + عدد المرات + الرسالة**\n**- مثـال : .مؤقت 12 12 السلام عليكم**"
         )
     zed = input_str[1:]
     try:
         int(zed[0])
     except Exception:
         return await edit_delete(
-            event, "__Use proper syntax for delay spam. For syntax refer help menu.__"
+            event, "**- ارسـل الامـر بالشكـل الآتي**\n\n`.مؤقت` **+ عدد الثواني + عدد المرات + الرسالة**\n**- مثـال : .مؤقت 12 12 السلام عليكم**"
         )
     await event.delete()
     addgvar("spamwork", True)
     await spam_function(event, reply, zed, sleeptimem, sleeptimet, DelaySpam=True)
+
+
+@zedub.zed_cmd(pattern="تعبير مكرر$")
+async def react_spam(event):
+    msg = await event.get_reply_message()
+    if not msg:
+        return await edit_delete(event, "**- بالـرد على الرسـالة اولاً ...**", 10)
+    zedevent = await edit_or_reply(event, "**- جـارِ بدء التفاعـلات انتظـر ...**")
+    if isinstance(msg.peer_id, types.PeerUser):
+        emoji = [
+            "👍",
+            "👎",
+            "❤",
+            "🔥",
+            "🥰",
+            "👏",
+            "😁",
+            "🤔",
+            "🤯",
+            "😱",
+            "🤬",
+            "😢",
+            "🎉",
+            "🤩",
+            "🤮",
+            "💩",
+        ]
+    else:
+        getchat = await event.client(GetFullChannelRequest(channel=event.chat_id))
+        grp_emoji = getchat.full_chat.available_reactions
+        if not grp_emoji:
+            return await edit_delete(
+                event, "**- اووبـس .. التعابير غير مفعلة في هـذه الدردشـة**", 6
+            )
+        emoji = grp_emoji
+    addgvar("spamwork", True)
+    await zedevent.delete()
+    while gvarstatus("spamwork"):
+        for i in emoji:
+            await asyncio.sleep(0.2)
+            try:
+                await msg.react(i, True)
+            except ForbiddenError:
+                pass
+
+
+@zedub.zed_cmd(pattern="ايقاف التكرار ?(.*)")
+async def stopspamrz(event):
+    if gvarstatus("spamwork") is not None and gvarstatus("spamwork") == "true":
+        delgvar("spamwork")
+        return await edit_delete(event, "**- تم ايقـاف التڪـرار .. بنجـاح ✅**")
+    return await edit_delete(event, "**- لايوجـد هنـاك تڪرار لـ إيقافه ؟!**")
+
+
+@zedub.zed_cmd(pattern=f"{UNSPAM} ?(.*)",)
+async def spammer(event):
+    reply = await event.get_reply_message()
+    await event.delete()
+    delgvar("spamwork")
+    await spam_function(event, reply, sleeptimem, sleeptimet, DelaySpam=False)
+
+
+
+# Copyright (C) 2022 Zed-Thon . All Rights Reserved
+@zedub.zed_cmd(pattern="التكرار")
+async def cmd(zelzallll):
+    await edit_or_reply(zelzallll, ZelzalSP_cmd)
+
