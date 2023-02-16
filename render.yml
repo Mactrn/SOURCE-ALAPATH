@@ -12,7 +12,7 @@ services:
     startCommand: gunicorn app:app & bash start
     region: frankfurt
     repo: https://github.com/Mactrn/SOURCE-ALAPATH      
-    branch: 313
+    branch: main
     envVars:
       - key: ALIVE_NAME
         sync: false
