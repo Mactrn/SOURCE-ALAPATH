@@ -1,4 +1,4 @@
-FROM thejmthon/jmub:slim-buster
+FROM Alapath1/zthon:slim-buster
 
 استنساخ بوابة RUN https://github.com/Alapath1/zthon.git / root / zthon
 
