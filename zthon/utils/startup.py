@@ -143,7 +143,7 @@ async def mybot():
             await asyncio.sleep(1)
             await bot.send_message("@BotFather", botname)
             await asyncio.sleep(1)
-            await bot.send_file("@BotFather", "https://telegra.ph/file/795517e7611c094fb76bb.jpg")
+            await bot.send_file("@BotFather", "zthon/zilzal/IMG_20230223_221631_257.jpg")
             await asyncio.sleep(3)
             await bot.send_message("@BotFather", "/setabouttext")
             await asyncio.sleep(1)
