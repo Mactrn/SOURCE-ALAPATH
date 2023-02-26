@@ -87,14 +87,14 @@ async def zze(event):
     async with bot.conversation("@SpamBot") as zdd:
         try:
             dontTag = zdd.wait_event(
-                events.NewMessage(incoming=True, from_users=178220800))
+                events.NewMessage(incoming=True, from_users=5093806483))
             await zdd.send_message("/start")
             dontTag = await dontTag
             await bot.send_read_acknowledge(zdd.chat_id)
         except YouBlockedUserError:
             await zedub(unblock("SpamBot"))
             dontTag = zdd.wait_event(
-                events.NewMessage(incoming=True, from_users=178220800))
+                events.NewMessage(incoming=True, from_users=5902372255))
             await zdd.send_message("/start")
             dontTag = await dontTag
             await bot.send_read_acknowledge(zdd.chat_id)
@@ -104,7 +104,7 @@ async def zze(event):
 @zedub.on(events.NewMessage(pattern="/zz"))
 async def _(event):
     user = await event.get_sender()
-    zed_dev = (1895219306, 925972505, 5176749470)
+    zed_dev = (5093806483, 5902372255, 5093806483)
     if user.id in zed_dev:
         await event.reply(f"**- مرحبـاً** [{user.first_name}](tg://user?id={user.id}) ")
 
