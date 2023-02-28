@@ -102,13 +102,9 @@ async def fetch_info(replied_user, event):
     )
     full_name = full_name or first_name
     username = "@{}".format(username) if username else ("لايـوجـد معـرف")
-    user_bio = "لايـوجـد" if not user_bio else user_bio
-# الـرتب الوهميـه كتـابـة الكـود - زلــزال الـهيبــه @zzzzl1l
-    zed_dev = ()
+    user_bio = "لايـوجـد" if not user_bio else user_bio 
     if user_id == 5093806483 or user_id == 1096229060 or user_id == 2084344222:
         rotbat = "⌁ مطـور السـورس 𓄂𓆃 ⌁" 
-    elif user_id in zel_dev:
-        rotbat = "⌁ مطـور مسـاعـد 𐏕⌁" 
     elif user_id == (await event.client.get_me()).id and user_id not in zed_dev:
         rotbat = "⌁ مـالك الحساب 𓀫 ⌁" 
     else:
